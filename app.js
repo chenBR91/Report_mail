@@ -7,9 +7,7 @@ const nodemailer = require('nodemailer')
 
 
 const app = express()
-//const server = http.Server(app);
-const PORT = process.env.PORT
-
+const PORT = process.env.PORT || 3000
 
 app.set("port", PORT);
 app.use(express.json())
@@ -23,12 +21,16 @@ app.get('/', (req, res) => {
     //res.sendFile(path.join(__dirname, "page/index.html"))
 })
 
-app.post("/send_email", (req, res) => {
-    const first_name = req.body.first_name;
-    const last_name = req.body.last_name;
+app.post("/send_email", async (req, res) => {
     const email_user = req.body.email;
     const subject = req.body.subject;
     const message = req.body.message;
+
+    // if(subject.length === 0) {
+    //     console.log(subject, " empty")
+    // }else {
+    //     console.log(subject, " not empty")
+    // }
 
     const transporter = nodemailer.createTransport({
         service: 'gamil',
@@ -48,9 +50,10 @@ app.post("/send_email", (req, res) => {
         text: message
     }
 
-    transporter.sendMail(mailOptions, (error, info) => {
+    await transporter.sendMail(mailOptions, (error, info) => {
         if(error) {
-            console.log(error)
+            console.log(error);
+            res.send(500);
         }
         else {
             console.log("**** Email send! ****")
